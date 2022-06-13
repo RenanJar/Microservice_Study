@@ -1,0 +1,15 @@
+server:
+  port: 8888
+spring:
+  application:
+    name: confgserver
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://github.com/RenanJar/Mircroservice_Config_Server
+          #username:
+          #password:
+          default-label: main
+          search-paths:
+          - 'greeting-service*'
