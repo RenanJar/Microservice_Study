@@ -1,5 +1,6 @@
 package com.bookservice.bookservice.controller;
 
+import com.bookservice.bookservice.Proxy.CambioProxy;
 import com.bookservice.bookservice.model.BookModel;
 import com.bookservice.bookservice.repository.BookRepository;
 import com.bookservice.bookservice.response.CambioModel;
@@ -25,8 +26,27 @@ public class BookController {
     @Autowired
     private BookRepository repository;
 
+    @Autowired
+    private CambioProxy proxy;
+
     @GetMapping(value="/{id}/{currency}")
     public BookModel findBook(@PathVariable("id") Long id,
+                              @PathVariable("currency") String currency){
+
+        var bookModel = repository.getById(id);
+        if(bookModel ==null) throw new RuntimeException("Book not Found");
+
+
+        var cambio = proxy.getcambio(bookModel.getPrice(),"USD",currency);
+
+        var port = environment.getProperty("local.server.port");
+        bookModel.setEnvironment("Book port: "+ port +"Cambio Port " + cambio.getEnvironment());
+        bookModel.setPrice(cambio.getConvertedValue());
+
+        return bookModel;
+    }
+
+    /*public BookModel findBook(@PathVariable("id") Long id,
                               @PathVariable("currency") String currency){
 
         var bookModel = repository.getById(id);
@@ -48,5 +68,5 @@ public class BookController {
         bookModel.setPrice(cambio.getConvertedValue());
 
         return bookModel;
-    }
+    }*/
 }
